@@ -17,21 +17,8 @@ prereqs:
 render:
 	./R/rmdToHtml.R leveraged_etf_analysis
 
-# run shiny server locally
-run_app:
-	R -e "shiny::runApp('../etf-leverage-comparator', display.mode='showcase')"
-
-# deploy to shinyapps.io
-deploy_app:
-	R -e "shinyapps::deployApp('../etf-leverage-comparator')"
-
-# slides (apply on branch gh-pages)
-slidify:
-	R -e "slidify::slidify('index.Rmd')"
-
-# view slides locally
-view_slides:
-	R -e "browseURL('index.html')"
+test:
+	./R/rmdToHtml.R unit_tests
 
 # remove generated files
 clean:
