@@ -233,8 +233,8 @@ would have performed over the same period.
   base.name <- "GDM" 
 
   ## load the etf's and run comparable sims
-  p2x <- loadAndSim(xts.base, source, "GDXX", type, "p2x", 3.0)
-  n2x <- loadAndSim(xts.base, source, "GDXS", type, "n2x", -3.0)
+  p2x <- loadAndSim(xts.base, source, "GDXX", type, "p2x", 2.0)
+  n2x <- loadAndSim(xts.base, source, "GDXS", type, "n2x", -2.0)
 
   ## merge all the series into a single xts
   xts.merged <- merge(xts.base,
@@ -322,5 +322,18 @@ chart.RiskReturnScatter(n2x.merged[,return.col.index], Rf=0.03/12, add.boxplots=
 
 
 
+
+
+## diagnostics
+
+```{r ddm_vs_applied_returns}
+ # 11079.46
+ head(xts.merged$p2x.DDM.Close, 1)
+ # 24994.14
+ tail(xts.merged$p2x.DDM.Close, 1)
+ # 24994.14
+ #   (11079.46 -> 10935.87 .. adjusting for 1st day's return)
+ tail(compoundBalances(10935.87, xts.merged$DDM.Return), 1)
+``` 
 
 

@@ -284,8 +284,8 @@ would have performed over the same period.
   base.name <- "GDM" 
 
   ## load the etf's and run comparable sims
-  p2x <- loadAndSim(xts.base, source, "GDXX", type, "p2x", 3.0)
-  n2x <- loadAndSim(xts.base, source, "GDXS", type, "n2x", -3.0)
+  p2x <- loadAndSim(xts.base, source, "GDXX", type, "p2x", 2.0)
+  n2x <- loadAndSim(xts.base, source, "GDXS", type, "n2x", -2.0)
 
   ## merge all the series into a single xts
   xts.merged <- merge(xts.base,
@@ -319,7 +319,7 @@ index, simulated leverage significantly outperformed the leveraged ETF.
 
 ```
 ##      GDM.Return.Monthly GDXS.Return.Monthly n2x.sim.Return.Monthly
-## 2015              -16.3                  26                   44.7
+## 2015              -16.3                28.6                   31.8
 ```
 
 #### Annualized Return
@@ -333,7 +333,7 @@ index, simulated leverage significantly outperformed the leveraged ETF.
 
 ```
 ##                   GDM.Return GDXS.Return n2x.sim.Return
-## Annualized Return     -37.71        85.9         156.69
+## Annualized Return     -37.71        94.8         102.82
 ```
 
 #### Performance Comparison
@@ -353,22 +353,22 @@ index, simulated leverage significantly outperformed the leveraged ETF.
 
 ```
 ##                 GDM.Return GDXS.Return n2x.sim.Return
-## Observations       95.0000     94.0000        95.0000
-## NAs                 0.0000      1.0000         0.0000
-## Minimum            -0.0671     -0.1060        -0.1357
-## Quartile 1         -0.0120     -0.0179        -0.0234
-## Median             -0.0009      0.0051         0.0028
-## Arithmetic Mean    -0.0017      0.0033         0.0052
-## Geometric Mean     -0.0019      0.0025         0.0037
-## Quartile 3          0.0078      0.0269         0.0361
-## Maximum             0.0452      0.1432         0.2012
-## SE Mean             0.0018      0.0041         0.0055
-## LCL Mean (0.95)    -0.0054     -0.0049        -0.0057
-## UCL Mean (0.95)     0.0019      0.0114         0.0160
-## Variance            0.0003      0.0016         0.0029
-## Stdev               0.0178      0.0399         0.0535
-## Skewness           -0.0999      0.0004         0.1019
-## Kurtosis            1.3685      1.1255         1.3701
+## Observations       95.0000     95.0000        95.0000
+## NAs                 0.0000      0.0000         0.0000
+## Minimum            -0.0671     -0.1060        -0.0905
+## Quartile 1         -0.0120     -0.0177        -0.0156
+## Median             -0.0009      0.0054         0.0019
+## Arithmetic Mean    -0.0017      0.0034         0.0034
+## Geometric Mean     -0.0019      0.0026         0.0028
+## Quartile 3          0.0078      0.0267         0.0241
+## Maximum             0.0452      0.1432         0.1341
+## SE Mean             0.0018      0.0041         0.0037
+## LCL Mean (0.95)    -0.0054     -0.0047        -0.0038
+## UCL Mean (0.95)     0.0019      0.0115         0.0107
+## Variance            0.0003      0.0016         0.0013
+## Stdev               0.0178      0.0397         0.0357
+## Skewness           -0.0991     -0.0124         0.0991
+## Kurtosis            1.3628      1.1537         1.3628
 ```
 
 #### Trailing 36-Month Returns
@@ -416,5 +416,37 @@ chart.RiskReturnScatter(n2x.merged[,return.col.index], Rf=0.03/12, add.boxplots=
 
 
 
+
+
+## diagnostics
+
+
+```r
+ # 11079.46
+ head(xts.merged$p2x.DDM.Close, 1)
+```
+
+```
+## NULL
+```
+
+```r
+ # 24994.14
+ tail(xts.merged$p2x.DDM.Close, 1)
+```
+
+```
+## NULL
+```
+
+```r
+ # 24994.14
+ #   (11079.46 -> 10935.87 .. adjusting for 1st day's return)
+ tail(compoundBalances(10935.87, xts.merged$DDM.Return), 1)
+```
+
+```
+## numeric(0)
+```
 
 

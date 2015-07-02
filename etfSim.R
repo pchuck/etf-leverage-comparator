@@ -11,7 +11,10 @@ loadSeries <- function(sym, data.source, startDate, endDate) {
     xts.ohlc <- getSymbols(Symbols=sym, src=data.source,
                            from=startDate, to=endDate, auto.assign=F, adjust=T)
     sym.clean <- gsub("\\^", "", sym) # remove index prefix characters from sym
+
+    # arithmetic mean, delta from previous days close to current day's close
     xts.r <- merge(dailyReturn(xts.ohlc), monthlyReturn(xts.ohlc))
+    
     colnames(xts.r) <- c(paste(sym.clean, ".", "Return", sep=""), 
                          paste(sym.clean, ".", "Return.Monthly", sep=""))
     merge(xts.ohlc, xts.r)
@@ -71,7 +74,7 @@ compoundBalances <- function(initial, deltas, multiplier=1.0, expense=0.0) {
 #                previous * expense
 #    }
 #    compounded
-
+#
     cumprod(1 + (deltas * multiplier - expense)) * initial
 }
 
@@ -91,14 +94,16 @@ simLeverage <- function(xts.ohlcr, multiplier, prefix, start.date) {
     xts.sub <- xts.ohlcr[index(xts.ohlcr) >= start.date, ]
     close.col.index <- grep("Close", names(xts.sub))
     return.col.index <- grep("Return$", names(xts.sub))
-    date.row.index <- which(index(xts.sub) >= start.date)
-    
-    # start with the initial balance..
-    initial <- as.vector(xts.sub[, close.col.index])[1]
+
+    ## the daily returns
+    v.base <- as.vector(xts.sub[, return.col.index])
+    ## eigenvalue - first closing value
+    eigen <- as.vector(xts.sub[, close.col.index])[1]
+    ## scale initial so, compounded by the first return, it will be correct
+    initial <- eigen / (v.base[1] * multiplier + 1)
     ## create a new, unitialized, xts from date index
     xts.sim <- xts(order.by=index(xts.sub))
     ## simulate the compound balances from initial using the deltas
-    v.base <- as.vector(xts.sub[, return.col.index])
     v.leveraged <- compoundBalances(initial, v.base, multiplier=multiplier)
     ## merge the returns and compound balances into the new xts timeseries
     xts.sim <- merge(xts.sim, sim.col.name.close=v.leveraged)
