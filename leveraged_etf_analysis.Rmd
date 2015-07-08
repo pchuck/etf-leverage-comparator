@@ -9,9 +9,22 @@ output:
 # Leveraged ETF Simulation and Analaysis
 ## Theoretical vs Actual Performance
 - Author: Patrick Charles
-- Date: 2015.06.28
+- Date: 2015.07.05
 
-### Summary
+
+## Summary
+
+The long-term performance of leveraged ETFs is analyzed and characterized.
+
+Leveraged ETF performance is compared to simulated ideal leverage and
+underlying non-leveraged indexes, and a number of characterizations
+are drawn from the analysis.
+
+Some unexpected results, both in short and long-term performance
+are presented.
+
+
+## Background
 
 Leveraged ETF's are exchanged traded funds that use derivatives
 and debt to magnify the returns of an underlying index. Such funds
@@ -22,18 +35,22 @@ Because of the compounding effects of magnified daily returns and
 price decay due to volatility, leveraged ETF managers typically do not
 recommend holding such funds for long periods.
 
-The following is an attempt to analyze and characterize the
-long-term performance of leveraged ETFs compared to both simulated
-ideal leveraged performance and the corresponding underlying non-leveraged
-indexes.
 
-All analysis below is performed in R and the code to transform and
-manipulate the data shown for reproducibility.
+## Analysis
+
+All analysis below is performed in R, and the code to transform and
+manipulate the data is shown for reproducibility.
 
 ### Environment
 
-#### Load the pre-requisite libraries
+#### Load the prerequisite libraries
 ```{r libraries, message=FALSE, warning=FALSE}
+  local({
+    r <- getOption("repos")
+    r["CRAN"] <- "http://cran.cnr.berkeley.edu/"
+    options(repos = r)
+  })
+  
   library(ggplot2)
   library(gridExtra)
   library(RColorBrewer)
@@ -64,7 +81,8 @@ manipulate the data shown for reproducibility.
 
 Several leveraged ETFs offer the ability to magnify the daily performance
 of the Dow Jones Industrial Average. Here's a look at historical
-DJI performance, since 2006-06-21. 
+DJI performance, since 2006-06-21, the date that leveraged ETF's tracking
+the index were first introduced.
 
 ```{r dji, warning=FALSE, message=FALSE, cache=TRUE, fig.width=10}
   base.symbol <- "^DJI"
@@ -72,7 +90,7 @@ DJI performance, since 2006-06-21.
   endDate <- Sys.Date()
   source <- "yahoo"
 
-  ## load the dji actual/base (+1x)
+  ## load the dji index historical data (+1x, actuals)
   xts.base <- loadSeries(base.symbol, source, startDate, endDate)  
 
   ggplot(xts.base, aes(x=index(xts.base), y=DJI.Close)) + geom_line() +
@@ -81,15 +99,15 @@ DJI performance, since 2006-06-21.
 
 ## DJI Index vs. ProShares Leveraged Dow ETFs
 
-2006.06.21 is the date that ProShares introduced leveraged ETF's to amplify
+On 2006.06.21, ProShares introduced leveraged ETF's to amplify
 the daily performance of the DJI Index by -1x, -2x and +2x.
 
-On 2010.02.11, ProShares introduced DOW ETF's with -3x and +3x leverage.
+On 2010.02.11, ProShares introduced DJI-based ETF's with -3x and +3x leverage.
 
 ### Performance
 
 The performance of the ETF's, since their inception, relative the underlying
-index can be visualized using ggplot.
+index, can be visualized using ggplot.
 
 In addition, using simulation, we can see how perfectly efficient leverage
 would have performed over the same period.
@@ -98,7 +116,7 @@ would have performed over the same period.
   type <- "Close" # use closing prices, to mirror the actual ETF daily target
   base.name <- "DJI" 
 
-  ## load the etf's and run comparable sims
+  ## load the etf's and run comparable simulations
   n1x <- loadAndSim(xts.base, source, "DOG", type, "n1x", -1.0)
   p2x <- loadAndSim(xts.base, source, "DDM", type, "p2x", 2.0)
   n2x <- loadAndSim(xts.base, source, "DXD", type, "n2x", -2.0)
@@ -138,10 +156,8 @@ simulated ETF and underlying index.
 ```{r dji_2x_calreturn}
   return.mon.col.idx <- grep("Return.Monthly", names(p2x.merged))
   tc <- table.CalendarReturns(p2x.merged[,return.mon.col.idx])[, -(1:12)]
-  tc$DDM_v_DJI <-
-    round(tc$DDM.Return.Monthly / tc$DJI.Return.Monthly, digits=2)
-  tc$DDM_v_SIM <-
-    round(tc$DDM.Return.Monthly / tc$p2x.sim.Return.Monthly, digits=2)
+  tc$DDM_v_DJI <- round(tc$DDM.Return.Monthly / tc$DJI.Return.Monthly, digits=2)
+  tc$DDM_v_SIM <- round(tc$DDM.Return.Monthly / tc$p2x.sim.Return.Monthly, digits=2)
   tc
 ```
 All leveraged ETF prospectuses warn that performance for any period
@@ -149,11 +165,12 @@ longer than a day, returns can diverge significantly from the target
 leverage multiplier. Nonetheless, on an annual basis,
 DDM averaged **`r mean(tc$DDM_v_DJI)`x**!
 
-Note, though, that this is due to coincidence, more than design, and the
-existence of a bull market over the same period. During that same period,
-there was very significant variation in the returns from year to year..
+Note, though, that this is due to coincidence more the design, particularly
+the existence of a bull market over the same period.
 
-Compared to the DJI, but DDM had best and worst year multiples of
+Within that period, there was very significant variation in the returns
+from year to year.. Compared to the DJI, DDM had best and worst year
+multiples of
 **`r max(tc$DDM_v_DJI)`x** and **`r min(tc$DDM_v_DJI)`x**, respectively.
 
 #### Total Annualized Returns
@@ -169,10 +186,9 @@ Compared to the DJI, but DDM had best and worst year multiples of
   round(returns.annual * 100, digits=2)
 ```
 
-On a yearly basis, at least since its inception, DDM has
-nearly doubled
+On a yearly basis, at least since its inception, DDM has nearly doubled
 **(by `r round(ddm.return.annual / dji.return.annual, digits=2)`x)**
-the annual return of the underlying DJI index annual return 
+the annual return of the underlying DJI index 
 **(`r round(dji.return.annual * 100, digits=2)`%)** and
 has outperformed the 2x simulated ETF
 **(by `r round(ddm.return.annual / p2x.return.annual, digits=2)`x)**.
@@ -233,10 +249,11 @@ for DDM compared to the DJI and simulated ETF, based on all daily
 returns since the inception of DDM. As expected, the functions are 'wider'
 and 'shorter' (because of the application of leverage to magnify returns)
 than the index and have more skew (because
-of the compounding effects and its compounding effects).
+of the compounding effects of leverage).
 
 Notice the very subtle difference between the shape of the DDM and
-simulated leverage curves. 
+simulated leverage curves. Again, very small differences in the periodic
+returns compound into signficant differences over longer periods.
 
 #### Relative Risk vs. Return (Trailing 36-Month Returns)
 
@@ -246,6 +263,80 @@ over the plot.
 
 ```{r dji_2x_rrr, fig.width=12}
 chart.RiskReturnScatter(p2x.merged[,return.mon.col.idx], Rf=0.03/12, add.boxplots=TRUE, colorset=colors.pair, xlim=c(0.0, 2.0), "Trailing 36-Month Performance")
+```
+
+### Tracking Error
+
+While leveraged ETF's are very good at magnifying the daily returns
+of an underlying index, they aren't perfect.
+
+Tracking errors are the differences between the actual and expected
+daily returns. Note that this is synonymous here with the
+difference between the actual and simulated leveraged daily returns.
+
+Tracking error can be visualized using a scatter plot of
+daily returns of the index vs. ETF. The slope of this relationship
+should equal the leverage factor.
+
+```{r scatter_dji_vs_etf, fig.width=12}
+
+  ddm <- ggplot(xts.merged, aes(x=DDM.Return, y=DJI.Return)) +
+    geom_point(alpha=0.9, color=colors.pair[2]) +
+    geom_smooth(method=lm, color="white", alpha=0.2) +
+    ggtitle("Daily Index Return vs. 2x ETF (DDM) Return") +
+    xlab("DDM Daily Return") + ylab("DJI Daily Return")
+
+  p2x.sim <- ggplot(xts.merged, aes(x=p2x.sim.Return, y=DJI.Return)) +
+    geom_point(alpha=0.9, color=colors.pair[3]) +
+    geom_smooth(method=lm, color="white", alpha=0.2) +
+    ggtitle("Daily Index Return vs. 2x Simulated Return") +
+    xlab("2x Simulated Daily Return") + ylab("DJI Daily Return")
+
+  grid.arrange(p2x.sim, ddm, ncol=2)
+```
+
+#### Linear Model
+
+Linear models can be constructed from the actual daily returns of the ETFs
+versus the corresponding underlying index.
+
+```{r dji_lm}
+  ddm.fit <- lm(data=xts.merged, DDM.Return ~ DJI.Return)
+  ddm.fit
+```
+The slope of the DDM model is `r ddm.fit$coef[2]`,
+indicating that the 2x ETF appears to be targeting/maintaining a
+slightly lower than advertised level of leverage.
+
+
+#### Residuals
+
+Residuals (the difference between the expected and actual value)
+of the daily returns can be visualized to determine if there is a
+discernable pattern in the tracking error of the ETFs.
+
+```{r dji_residual, fig.width=12}
+  ddm.resid <- resid(ddm.fit)
+
+  ddm <- ggplot(xts.merged, aes(x=DDM.Return, y=ddm.resid)) + 
+    geom_point(alpha=0.9, color=colors.pair[2]) +
+    geom_smooth(method=lm) + 
+    ggtitle("Residuals: DDM vs. DJI") +
+    xlab("DDM Daily Return") +
+    ylab("Variation from Expected")
+
+#  grid.arrange(gdxx, ddm, ncol=2)
+```
+
+#### Diagnostics
+
+A set of diagnostics plots is used to identify outliers in the residuals
+vs. fitted values.
+
+```{r dji_diagnostic, fig.width=12}
+
+  autoplot(ddm.fit, data=as.data.frame(xts.merged),
+    colour=colors.pair[2], smooth.colour='gray', label.size=3)
 ```
 
 
@@ -265,7 +356,7 @@ ETF's on 2015-02-13.
   endDate <- Sys.Date()
   source <- "yahoo"
 
-  ## load the gdm actual/base (+1x) 
+  ## load the gdm index historical data (+1x, actuals) 
   xts.base <- loadSeries(base.symbol, source, startDate, endDate)
   
   ggplot(xts.base, aes(x=index(xts.base), y=GDM.Close)) + geom_line() +
@@ -274,13 +365,13 @@ ETF's on 2015-02-13.
 
 ## GDM Index vs. ProShares Leveraged ETFs
 
-2015.02.13 is the date that ProShares introduced leveraged ETF's to amplify
+On 2015.02.13, ProShares introduced leveraged ETF's to amplify
 the daily performance of the GDM Index by +/- 2x.
 
 ### Performance
 
 The performance of the ETF's, since their inception, relative the underlying
-index can be visualized using ggplot.
+index, can be visualized using ggplot.
 
 In addition, using simulation, we can see how perfectly efficient leverage
 would have performed over the same period.
@@ -352,6 +443,7 @@ with a return that was was **`r mean(tc$GDXS_v_SIM)`x** that of ideal.
 ```{r gdm_2x_perf, fig.width=12, fig.height=12, echo=FALSE}
   charts.PerformanceSummary(n2x.merged[,return.col.index], colorset=colors.pair[c(1, 4:5)], lwd=2, ylog=TRUE)
 ```
+
 The GDXS ETF underperformed and was more risky than the ideal -2x simulated
 ETF. This is evident in the drawdown chart which shows consistently larger
 potential losses for the ETF vs. simulated returns.
@@ -401,7 +493,8 @@ chart.RiskReturnScatter(n2x.merged[,return.col.index], Rf=0.03/12, add.boxplots=
 
 
 ### Tracking Error
-While leveraged ETF's are very good at magnifying the daily returns
+
+Again, while leveraged ETF's are very good at magnifying the daily returns
 of an underlying index, they aren't perfect.
 
 Tracking errors are the differences between the actual and expected
@@ -442,7 +535,6 @@ The slope of the GDXS model is `r gdxs.fit$coef[2]`,
 indicating that the -2x ETF appears to be targeting/maintaining a
 slightly higher than advertised level of leverage.
 
-
 #### Residuals
 
 Residuals (the difference between the expected and actual value)
@@ -464,10 +556,9 @@ discernable pattern in the tracking error of the ETFs.
 
 #### Diagnostics
 
-A set of diagnostics plots are used to identify outliers in the residuals
+A set of diagnostics plots is used to identify outliers in the residuals
 vs. fitted values.
 
-We can use a set diagnostics to idetify outliers
 ```{r gdm_diagnostic, fig.width=12}
 
   autoplot(gdxs.fit, data=as.data.frame(xts.merged),
@@ -484,6 +575,47 @@ tracking errors.
 * 2015-02-20 GDM: 19.37-18.66 -3.67%    vs. -5.96% expected  (vol  6901)
 * 2015-02-17 GDM: 20.56-19.00 -7.58%    vs. -5.98% expected  (vol  1000)
 
-[NOTE: Causes here are not known. Looked at sector news, trading volumes
- and other factors; don't see any obvious reason for the discrepancies]
- 
+
+## Conclusions
+
+### Short-term Performance
+
+The short-term characteristics of leveraged ETFs are well understood
+and documented in fund prospectuses. But do they track daily returns
+as closely as portrayed?
+
+* Over daily periods, leveraged ETF's achieve returns that are statistically different than the advertised target leverage multipliers.
+  * Based on the linear models above, the +2x leveraged ETF DDM consistently achieves daily leverage of **`r sprintf("%.1f", ddm.fit$coef[2])`x** while the -2x leveraged ETF GDXS appears to target daily leverage of **`r sprintf("%.1f", gdxs.fit$coef[2])`x**.
+
+### Long-term Performance 
+
+Long-term performance of leveraged ETFs is not as well understood due to the impacts compounded leverage and volatility in differerent market scenarios. 
+
+The visualizations presented illustrate the long-term impact of different levels of leverage and the relative performance of an underlying index compared to the family of leveraged ETFs derived from the index. The drawdown charts highlight potential long-term loss exposures at varying levels of leverage.
+
+* Over longer periods, leveraged ETF's can consistently achieve returns that are better than underlying indexes, despite warnings from issuers against long-term holdings.
+  * The DDM leveraged ETF has existed for over nine years. Over this period
+(which includes both the secular bull market starting in 2009 and the financial crisis of 2008 that preceded it), DDM has nearly doubled **(by `r round(ddm.return.annual / dji.return.annual, digits=2)`x)** the annual return of the underlying DJI index **(`r round(dji.return.annual * 100, digits=2)`%)**
+
+* Over periods of mostly monotonic returns in the underlying index, leveraged ETF's can significantly outperform the simulated/ideal ETF returns.
+  * Since its inception, the DDM leveraged ETF's annualized return **(`r round(ddm.return.annual * 100, digits=2)`%)** outperformed the simulated 2x ETF return **(by `r round(ddm.return.annual / p2x.return.annual, digits=2)`x)**.
+
+### Risk vs. Return
+
+More important than raw returns, is relative risk. In the ETFs analyzed, this metric varies.
+* In the case of DDM, the return/risk ratio is superior to the risk-free rate of return, the underlying index and simulated leverage.
+* In the case of GDXS, the return/risk ratio lags slightly behind the simulated leverage.
+
+
+## Further Work
+
+* The Q-Q diagnostic plot indicates that the daily returns of the leveraged ETFs are not statistically normal. The curves exhibit 'heavy tails'. A T-distribution might be more representative and more work could be done to characterize and understand the distribution of leveraged daily returns.
+
+* The diagnostic leverage plots identified a number of points/dates where the leveraged ETF's deviated from their target leverage multiplier. More work could be done to identify the market factors that cause such outlying variances and to quantify the impact on long-term returns.
+
+* The tracking error plots and linear models also identify consistent variances from advertised leverage factors. While the variance is statistically significant, the cause is not known (e.g. whether the increased/decreased leverage is intentional or due to inaccuracies in the financial methods or instruments used to attain leverage.)
+
+
+
+
+  
