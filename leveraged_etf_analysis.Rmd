@@ -1,16 +1,13 @@
 ---
 title: "Long-Term Leveraged ETF Performance"
 author: "[patrick charles](http://www.pchuck.org)"
+date: 2015.07.09
 output:  
     html_document:
         keep_md: true
 ---
 
-# Long-Term Leveraged ETF Performance
 ## An Analysis of Theoretical Simulated vs Actual Performance
-- Author: [patrick charles](http://www.pchuck.org)
-- Date: `r Sys.Date()`
-
 
 ## Summary
 
@@ -171,8 +168,7 @@ simulated ETF and underlying index.
   kable(tc)
 ```
 
-Leveraged ETF prospectuses[^1] warn that performance for any period
-longer than a day, returns can diverge significantly from the target
+Leveraged ETF returns for any period can diverge significantly from the target
 leverage multiplier. Nonetheless, on an annual basis,
 DDM averaged **`r mean(tc$DDM_v_DJI)`x**!
 

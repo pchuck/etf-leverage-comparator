@@ -1,11 +1,8 @@
 # Long-Term Leveraged ETF Performance
 [patrick charles](http://www.pchuck.org)  
+2015.07.09  
 
-# Long-Term Leveraged ETF Performance
 ## An Analysis of Theoretical Simulated vs Actual Performance
-- Author: [patrick charles](http://www.pchuck.org)
-- Date: 2015-07-09
-
 
 ## Summary
 
@@ -150,8 +147,7 @@ simulated ETF and underlying index.
 2014                   7.5                 18.0                     14.2        2.40        1.27
 2015                  -1.7                 -2.4                     -4.2        1.41        0.57
 
-Leveraged ETF prospectuses[^1] warn that performance for any period
-longer than a day, returns can diverge significantly from the target
+Leveraged ETF returns for any period can diverge significantly from the target
 leverage multiplier. Nonetheless, on an annual basis,
 DDM averaged **2.012x**!
 
