@@ -1,28 +1,24 @@
 # etf-leverage-comparator
 #
-# Coursera, Developing Data Products, Final Project
-# shiny application and slidify presentation
+# Long-Term Leveraged ETF PErformance
+#   an analysis of theoretical simulated vs actual performance
 #
 
 # tmuxinator an R dev environment
 create_env:
-	tmuxinator start r-sandbox
+	tmuxinator start r-financial
 
-# install prerequisite packages
-prereqs:
-	R -e "install.packages(c('devtools', 'shiny'), repos='http://cran.us.r-project.org'); devtools::install_github('rstudio/shinyapps')"
-	R -e "devtools::install_github('ramnathv/slidify'); devtools::install_github('ramnathv/slidifyLibraries');"
-
-# render the etf comparison analysis
+RMD=leveraged_etf_analysis
 render:
-	./R/rmdToHtml.R leveraged_etf_analysis
+	Rscript -e "rmarkdown::render('$(RMD).Rmd', 'html_document', '$(RMD).html'); browseURL('$(RMD).html')"
 
+RTEST=unit_tests
 test:
-	./R/rmdToHtml.R unit_tests
+	Rscript -e "rmarkdown::render('$(RTEST).Rmd', 'html_document', '$(RTEST).html'); browseURL('$(RTEST).html')"
 
 # remove generated files
 clean:
 	rm -f *.html *.md
-	rm -rf figure/
-	rm -rf cache/
+	rm -rf *_figure/
+	rm -rf *_cache/
 

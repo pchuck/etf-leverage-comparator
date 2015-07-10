@@ -1,0 +1,100 @@
+---
+title: "Long-Term Leveraged ETF Performance - Unit Tests"
+author: "[patrick charles](http://www.pchuck.org)"
+output:  
+    html_document:
+        keep_md: true
+---
+
+
+## Unit Tests
+
+### Load the pre-requisite libraries
+```{r libraries, message=FALSE, warning=FALSE}
+  library(ggplot2)
+  library(RColorBrewer)
+  library(reshape2)
+  library(quantmod)
+  if(!require(PerformanceAnalytics))
+    install.packages("PerformanceAnalytics", dep=T)
+  library(PerformanceAnalytics)
+
+  source("etfSim.R")
+```
+
+### One
+
+Load the data
+
+```{r unit_test_1, message=FALSE, warning=FALSE, cache=TRUE, fig.width=12}
+  base.symbol <- "^DJI"
+  startDate <- "2006-06-21"
+  endDate <- Sys.Date()
+  source <- "yahoo"
+
+  ## load the dji actual/base (+1x)
+  xts.base <- loadSeries(base.symbol, source, startDate, endDate)  
+
+  ggplot(xts.base, aes(x=index(xts.base), y=DJI.Close)) + geom_line() +
+          xlab("Date") + ylab("Price") + ggtitle("DJI Closing Price")
+```
+
+Two different methods for calculating simulated leverage should
+yield the same results.
+
+```{r unit_test_sim}
+  type <- "Close" # use closing prices, to mirror the actual ETF daily target
+  base.name <- "DJI" 
+
+  p2x <- loadAndSim(xts.base, source, "DDM", type, "p2x", 2.0)
+  p2x.merged <- merge(xts.base, p2x$etf, p2x$sim)
+```
+
+## Two
+
+Calculated period returns for ETF should match reported period returns.
+
+### DDM - Calendar Year Returns
+```{r unit_calreturn}
+  return.monthly.col.index <- grep("Return.Monthly", names(p2x.merged))
+  table.CalendarReturns(p2x.merged[,return.monthly.col.index])[, -(1:12)]
+
+  # vs http://www.proshares.com/media/prospectus/ddm_summary_prospectus.pdf
+  #   2007   8.71%
+  #   2008  61.68%
+  #   2009  39.59%
+  #   2010  25.02%
+  #   2011  10.71%
+  #   2012  18.20%
+  #   2013  63.81%
+  #
+  # (actual returns are ~0.5% higher per year?)
+
+  # vs. http://1stock1.com/1stock1_139.htm
+  #   2007   6.43%
+  #   2008 -33.84%
+  #   2009  18.82%
+  #   2010  11.02%
+  #   2011   5.53%
+  #   2012   7.26%
+  #   2013  26.5%
+  #   2014   7.52%
+  #
+  # (actual returns match reported, perfectly)
+```
+
+
+## diagnostics
+
+```{r unit_ddm_vs_applied_returns}
+# # 11079.46
+# head(xts.merged$p2x.DDM.Close, 1)
+# # 24994.14
+# tail(xts.merged$p2x.DDM.Close, 1)
+# # 24994.14
+# #   (11079.46 -> 10935.87 .. adjusting for 1st day's return)
+# tail(compoundBalances(10935.87, xts.merged$DDM.Return), 1)
+``` 
+
+
+

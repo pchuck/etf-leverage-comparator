@@ -1,8 +1,15 @@
-leveraged_etf_analysis.html
-index.md
-libraries
-cache/
 .RData
 .Rhistory
 
+# knitr generated files
+leveraged_etf_analysis.html
+leveraged_etf_analysis_cache/
+unit_tests.html
+unit_tests.md
+unit_tests_cache/
+unit_tests_files/
+
+# keep these so project renders on github
+#leveraged_etf_analysis.md
+#leveraged_etf_analysis_files/
 
