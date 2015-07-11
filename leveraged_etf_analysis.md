@@ -1,6 +1,6 @@
 # Long-Term Leveraged ETF Performance
 [patrick charles](http://www.pchuck.org)  
-2015.07.09  
+`r Sys.Date()`  
 
 ## An Analysis of Theoretical Simulated vs Actual Performance
 
@@ -30,7 +30,8 @@ leveraged ETFs for periods longer than a day[^2].
 ## Analysis
 
 All analysis below is performed in R, and the code to transform and
-manipulate the data is shown for reproducibility.
+manipulate the data is shown for reproducibility. Source code for the
+custom functions can be found at [github.com/pchuck/etf-leverage-comparator](https://github.com/pchuck/etf-leverage-comparator).
 
 
 
@@ -131,21 +132,34 @@ simulated ETF and underlying index.
   tc <- table.CalendarReturns(p2x.merged[,return.mon.col.idx])[, -(1:12)]
   tc$DDM_v_DJI <- round(tc$DDM.Return.Monthly / tc$DJI.Return.Monthly, digits=2)
   tc$DDM_v_SIM <- round(tc$DDM.Return.Monthly / tc$p2x.sim.Return.Monthly, digits=2)
-  kable(tc)
+#  kable(tc)
+  tc
 ```
 
-        DJI.Return.Monthly   DDM.Return.Monthly   p2x.sim.Return.Monthly   DDM_v_DJI   DDM_v_SIM
------  -------------------  -------------------  -----------------------  ----------  ----------
-2006                  13.6                 26.8                     26.0        1.97        1.03
-2007                   6.4                  8.6                     10.9        1.34        0.79
-2008                 -33.8                -61.8                    -62.1        1.83        1.00
-2009                  18.8                 39.7                     33.2        2.11        1.20
-2010                  11.0                 25.4                     20.1        2.31        1.26
-2011                   5.5                 10.4                      6.5        1.89        1.60
-2012                   7.3                 17.7                     13.5        2.42        1.31
-2013                  26.5                 64.7                     58.4        2.44        1.11
-2014                   7.5                 18.0                     14.2        2.40        1.27
-2015                  -1.7                 -2.4                     -4.2        1.41        0.57
+```
+##      DJI.Return.Monthly DDM.Return.Monthly p2x.sim.Return.Monthly
+## 2006               13.6               26.8                   26.0
+## 2007                6.4                8.6                   10.9
+## 2008              -33.8              -61.8                  -62.1
+## 2009               18.8               39.7                   33.2
+## 2010               11.0               25.4                   20.1
+## 2011                5.5               10.4                    6.5
+## 2012                7.3               17.7                   13.5
+## 2013               26.5               64.7                   58.4
+## 2014                7.5               18.0                   14.2
+## 2015               -1.7               -2.4                   -4.2
+##      DDM_v_DJI DDM_v_SIM
+## 2006      1.97      1.03
+## 2007      1.34      0.79
+## 2008      1.83      1.00
+## 2009      2.11      1.20
+## 2010      2.31      1.26
+## 2011      1.89      1.60
+## 2012      2.42      1.31
+## 2013      2.44      1.11
+## 2014      2.40      1.27
+## 2015      1.41      0.57
+```
 
 Leveraged ETF returns for any period can diverge significantly from the target
 leverage multiplier. Nonetheless, on an annual basis,
@@ -170,12 +184,14 @@ multiples of
   ddm.return.annual <- returns.annual[2]
   p2x.return.annual <- returns.annual[3]
 
-  kable(round(returns.annual * 100, digits=2))
+#  kable(round(returns.annual * 100, digits=2))
+  round(returns.annual * 100, digits=2)
 ```
 
-                     DJI.Return   DDM.Return   p2x.sim.Return
-------------------  -----------  -----------  ---------------
-Annualized Return          5.31         9.48             6.77
+```
+##                   DJI.Return DDM.Return p2x.sim.Return
+## Annualized Return       5.31       9.48           6.77
+```
 
 On a yearly basis, at least since its inception, DDM has nearly doubled
 **(by 1.78x)**
@@ -195,27 +211,29 @@ downside exposure in DDM than the simulated 2x ETF.
 #### Performance Statistics Comparison
 
 ```r
-  kable(table.Stats(p2x.merged[,return.col.index]))
+#  kable(table.Stats(p2x.merged[,return.col.index]))
+  table.Stats(p2x.merged[,return.col.index])
 ```
 
-                   DJI.Return   DDM.Return   p2x.sim.Return
-----------------  -----------  -----------  ---------------
-Observations        2277.0000    2277.0000        2277.0000
-NAs                    0.0000       0.0000           0.0000
-Minimum               -0.0787      -0.1597          -0.1575
-Quartile 1            -0.0043      -0.0084          -0.0085
-Median                 0.0006       0.0014           0.0011
-Arithmetic Mean        0.0003       0.0006           0.0006
-Geometric Mean         0.0002       0.0004           0.0003
-Quartile 3             0.0055       0.0110           0.0110
-Maximum                0.1108       0.2259           0.2216
-SE Mean                0.0003       0.0005           0.0005
-LCL Mean (0.95)       -0.0002      -0.0003          -0.0004
-UCL Mean (0.95)        0.0008       0.0016           0.0016
-Variance               0.0002       0.0006           0.0006
-Stdev                  0.0123       0.0237           0.0245
-Skewness               0.1487       0.0213           0.1487
-Kurtosis              10.9049       9.9589          10.9049
+```
+##                 DJI.Return DDM.Return p2x.sim.Return
+## Observations     2277.0000  2277.0000      2277.0000
+## NAs                 0.0000     0.0000         0.0000
+## Minimum            -0.0787    -0.1597        -0.1575
+## Quartile 1         -0.0043    -0.0084        -0.0085
+## Median              0.0006     0.0014         0.0011
+## Arithmetic Mean     0.0003     0.0006         0.0006
+## Geometric Mean      0.0002     0.0004         0.0003
+## Quartile 3          0.0055     0.0110         0.0110
+## Maximum             0.1108     0.2259         0.2216
+## SE Mean             0.0003     0.0005         0.0005
+## LCL Mean (0.95)    -0.0002    -0.0003        -0.0004
+## UCL Mean (0.95)     0.0008     0.0016         0.0016
+## Variance            0.0002     0.0006         0.0006
+## Stdev               0.0123     0.0237         0.0245
+## Skewness            0.1487     0.0213         0.1487
+## Kurtosis           10.9049     9.9589        10.9049
+```
 
 #### Trailing 36-Month Returns
 
@@ -462,12 +480,16 @@ simulated ETF and underlying index.
   tc <- table.CalendarReturns(n2x.merged[,return.mon.col.idx])[, -(1:12)]
   tc$GDXS_v_GDM <- round(tc$GDXS.Return.Monthly / tc$GDM.Return.Monthly, digits=2)
   tc$GDXS_v_SIM <- round(tc$GDXS.Return.Monthly / tc$n2x.sim.Return.Monthly, digits=2)
-  kable(tc)
+#  kable(tc)
+  tc
 ```
 
-        GDM.Return.Monthly   GDXS.Return.Monthly   n2x.sim.Return.Monthly   GDXS_v_GDM   GDXS_v_SIM
------  -------------------  --------------------  -----------------------  -----------  -----------
-2015                 -20.4                  40.9                     44.4           -2         0.92
+```
+##      GDM.Return.Monthly GDXS.Return.Monthly n2x.sim.Return.Monthly
+## 2015              -20.4                40.9                   44.4
+##      GDXS_v_GDM GDXS_v_SIM
+## 2015         -2       0.92
+```
 
 On an annual basis, GDXS averaged **-2x** the return
 of the base index.
@@ -487,27 +509,29 @@ potential losses for the ETF vs. simulated returns.
 #### Performance Statistics Comparison
 
 ```r
-  kable(table.Stats(n2x.merged[,return.col.index]))
+#  kable(table.Stats(n2x.merged[,return.col.index]))
+  table.Stats(n2x.merged[,return.col.index])
 ```
 
-                   GDM.Return   GDXS.Return   n2x.sim.Return
-----------------  -----------  ------------  ---------------
-Observations         100.0000      100.0000         100.0000
-NAs                    0.0000        0.0000           0.0000
-Minimum               -0.0671       -0.1060          -0.0905
-Quartile 1            -0.0126       -0.0182          -0.0159
-Median                -0.0010        0.0056           0.0019
-Arithmetic Mean       -0.0021        0.0042           0.0042
-Geometric Mean        -0.0023        0.0034           0.0036
-Quartile 3             0.0079        0.0271           0.0252
-Maximum                0.0452        0.1432           0.1341
-SE Mean                0.0018        0.0040           0.0036
-LCL Mean (0.95)       -0.0057       -0.0038          -0.0030
-UCL Mean (0.95)        0.0015        0.0123           0.0114
-Variance               0.0003        0.0016           0.0013
-Stdev                  0.0181        0.0404           0.0362
-Skewness              -0.1507        0.0517           0.1507
-Kurtosis               1.1748        0.9785           1.1748
+```
+##                 GDM.Return GDXS.Return n2x.sim.Return
+## Observations      100.0000    100.0000       100.0000
+## NAs                 0.0000      0.0000         0.0000
+## Minimum            -0.0671     -0.1060        -0.0905
+## Quartile 1         -0.0126     -0.0182        -0.0159
+## Median             -0.0010      0.0056         0.0019
+## Arithmetic Mean    -0.0021      0.0042         0.0042
+## Geometric Mean     -0.0023      0.0034         0.0036
+## Quartile 3          0.0079      0.0271         0.0252
+## Maximum             0.0452      0.1432         0.1341
+## SE Mean             0.0018      0.0040         0.0036
+## LCL Mean (0.95)    -0.0057     -0.0038        -0.0030
+## UCL Mean (0.95)     0.0015      0.0123         0.0114
+## Variance            0.0003      0.0016         0.0013
+## Stdev               0.0181      0.0404         0.0362
+## Skewness           -0.1507      0.0517         0.1507
+## Kurtosis            1.1748      0.9785         1.1748
+```
 
 #### Trailing 36-Month Returns
 

@@ -1,7 +1,7 @@
 ---
 title: "Long-Term Leveraged ETF Performance"
 author: "[patrick charles](http://www.pchuck.org)"
-date: 2015.07.09
+date: "`r Sys.Date()`"
 output:  
     html_document:
         keep_md: true
@@ -35,7 +35,8 @@ leveraged ETFs for periods longer than a day[^2].
 ## Analysis
 
 All analysis below is performed in R, and the code to transform and
-manipulate the data is shown for reproducibility.
+manipulate the data is shown for reproducibility. Source code for the
+custom functions can be found at [github.com/pchuck/etf-leverage-comparator](https://github.com/pchuck/etf-leverage-comparator).
 
 ```{r libraries, message=FALSE, warning=FALSE, echo=FALSE}
 ### Environment
@@ -165,7 +166,8 @@ simulated ETF and underlying index.
   tc <- table.CalendarReturns(p2x.merged[,return.mon.col.idx])[, -(1:12)]
   tc$DDM_v_DJI <- round(tc$DDM.Return.Monthly / tc$DJI.Return.Monthly, digits=2)
   tc$DDM_v_SIM <- round(tc$DDM.Return.Monthly / tc$p2x.sim.Return.Monthly, digits=2)
-  kable(tc)
+#  kable(tc)
+  tc
 ```
 
 Leveraged ETF returns for any period can diverge significantly from the target
@@ -190,7 +192,8 @@ multiples of
   ddm.return.annual <- returns.annual[2]
   p2x.return.annual <- returns.annual[3]
 
-  kable(round(returns.annual * 100, digits=2))
+#  kable(round(returns.annual * 100, digits=2))
+  round(returns.annual * 100, digits=2)
 ```
 
 On a yearly basis, at least since its inception, DDM has nearly doubled
@@ -213,7 +216,8 @@ downside exposure in DDM than the simulated 2x ETF.
 
 #### Performance Statistics Comparison
 ```{r dji_2x_stats}
-  kable(table.Stats(p2x.merged[,return.col.index]))
+#  kable(table.Stats(p2x.merged[,return.col.index]))
+  table.Stats(p2x.merged[,return.col.index])
 ```
 
 #### Trailing 36-Month Returns
@@ -433,7 +437,8 @@ simulated ETF and underlying index.
   tc <- table.CalendarReturns(n2x.merged[,return.mon.col.idx])[, -(1:12)]
   tc$GDXS_v_GDM <- round(tc$GDXS.Return.Monthly / tc$GDM.Return.Monthly, digits=2)
   tc$GDXS_v_SIM <- round(tc$GDXS.Return.Monthly / tc$n2x.sim.Return.Monthly, digits=2)
-  kable(tc)
+#  kable(tc)
+  tc
 ```
 
 On an annual basis, GDXS averaged **`r mean(tc$GDXS_v_GDM)`x** the return
@@ -461,7 +466,8 @@ potential losses for the ETF vs. simulated returns.
 
 #### Performance Statistics Comparison
 ```{r gdm_2x_stats}
-  kable(table.Stats(n2x.merged[,return.col.index]))
+#  kable(table.Stats(n2x.merged[,return.col.index]))
+  table.Stats(n2x.merged[,return.col.index])
 ```
 
 #### Trailing 36-Month Returns
