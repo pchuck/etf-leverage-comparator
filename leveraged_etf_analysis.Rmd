@@ -26,7 +26,7 @@ are presented.
 
 ## Background
 
-Leveraged ETF's are exchanged traded funds that use derivatives
+Leveraged ETF's are exchange traded funds that use derivatives
 and debt to magnify the returns of an underlying index. Such funds
 apply a leverage multiplier (typical 2x or 3x) to amplify an index's
 actual returns on a daily basis.
