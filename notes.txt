@@ -1,0 +1,81 @@
+
+2015.06.19
+
+  (from yahoo)
+    DJI Prev Close - 18115.84
+    DJI Open - 18116.24
+    DJI Adj Close - 18015.95
+    DJI Return - (18015.95-18115.84)/18115.84 = -0.005513959    (prev close to close)   <- correct
+    DJI Return x 2 - (18015.95-18115.84)/18115.84 * 2 = -0.01102792
+
+  (from xts.merged)
+    DJI Prev Close - 18115.84
+    DJI Close - 18015.95
+    DJI Return - -0.005513994
+      (difference) - -0.000000035 (ok)
+    DJI Return x 2 - -0.01102799
+
+  (from xts.merged)
+    DJI.Return * 2  -0.01102799
+    p2x.Return      -0.01102799
+    DDM.Return      -0.01171261
+
+  DDM Return (from yahoo)
+    > (69.01-69.82)/69.82
+    [1] -0.01160126
+
+
+    
+  w/ Delt (???)
+    Delt>lt(xts.merged$DJI.Open,xts.merged$DJI.Close)[index(xts.merged) == "2015-06-19", ]
+           Delt.0.arithmetic
+           2015-06-19      -0.005535973
+           
+  w/ dailyReturn
+  > dailyReturn(xts.ohlc)[index(dailyReturn(xts.ohlc)) == "2015-06-19", ]
+    daily.returns
+    2015-06-19  -0.005513994
+
+> dailyReturn(xts.ohlc, type='arithmeticx(xts.ohlc) == "2015-06-19", ]
+           daily.returns
+           2015-06-19  -0.005513994 *
+> dailyReturn(xts.ohlc, type='log')[index(xts.ohlc) == "2015-06-19", ]
+           daily.returns
+           2015-06-19  -0.005529252
+
+  
+
+
+notes:
+  ProShares Real Estate - URE and SRS.. can't get data for underlying DJUSRET
+  Direxion Energy - since 2007, but can't fetch ^GSPE historical
+
+http://cran.r-project.org/web/packages/PerformanceAnalytics/vignettes/PA-charts.pdf
+
+xts.gspc <- getSymbols(Symbols="^GSPC", src="yahoo", auto.assign=FALSE)
+xts.dji <- getSymbols(Symbols="^DJI", src="yahoo", auto.assign=FALSE)
+
+
+
+xts.gspc <- getSymbols(Symbols="^GSPC", src="yahoo", auto.assign=FALSE)
+xts.dji <- getSymbols(Symbols="^DJI", src="yahoo", auto.assign=FALSE)
+monthlyReturn(xts.dji)
+library(PerformanceAnalytics)
+
+calculate returns
+  xts.dji$DJI.Return <- dailyReturn(xts.dji)
+      OR
+        Return.calculate(xts.dji)
+
+annualize returns..
+  Return.annualized(Return.calculate(xts.dji))
+
+table.CalendarReturns(xts.dji[,c(which(colnames(xts.dji) == "DJI.Return"))])
+
+?chart.RelativePerformance
+
+Return.relative
+
+fix colors?
+  colorset=
+  
